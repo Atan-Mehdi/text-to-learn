@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <rect width="32" height="32" rx="9" fill="#09090b" />
+  <rect x="0.75" y="0.75" width="30.5" height="30.5" rx="8.25" stroke="#27272a" stroke-width="1.5" />
+  <!-- Minimalist Interlocking Geometric Polygons -->
+  <path d="M9 11L16 7L23 11L16 15L9 11Z" fill="#10b981" />
+  <path d="M9 16L16 20L23 16L16 12L9 16Z" fill="#34d399" fill-opacity="0.85" />
+  <path d="M9 21L16 25L23 21L16 17L9 21Z" fill="#059669" fill-opacity="0.7" />
+</svg>
