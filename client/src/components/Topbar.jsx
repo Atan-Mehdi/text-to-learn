@@ -36,7 +36,7 @@ export default function Topbar() {
   };
 
   return (
-    <header className="h-16 sm:h-20 border-b border-[var(--border)] bg-[var(--bg-page)]/85 backdrop-blur-xl sticky top-0 z-40 px-3 sm:px-6 md:px-12 lg:px-20 flex items-center justify-between transition-colors duration-200 w-full max-w-full overflow-x-clip">
+    <header className="h-16 sm:h-20 border-b border-[var(--border)] bg-[var(--bg-page)]/85 backdrop-blur-xl sticky top-0 z-50 px-3 sm:px-6 md:px-12 lg:px-20 flex items-center justify-between transition-colors duration-200 w-full max-w-full">
 
       <div className="flex items-center min-w-0 flex-shrink-0">
         <Link to="/" className="flex items-center gap-2 sm:gap-3.5 group cursor-pointer select-none">
@@ -121,7 +121,7 @@ export default function Topbar() {
             </button>
 
             {showDropdown && (
-              <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-[var(--bg-card)] border border-[var(--border)] shadow-xl p-2 z-50 animate-in fade-in duration-150">
+              <div className="absolute right-0 top-full mt-2 w-56 rounded-2xl bg-[var(--bg-card)] border border-[var(--border)] shadow-2xl p-2 z-[100] animate-in fade-in duration-150">
                 <div className="px-3 py-2 border-b border-[var(--border)] mb-1">
                   <p className="text-xs font-bold text-[var(--text-primary)] truncate">{user.name}</p>
                   <p className="text-[11px] text-[var(--text-dim)] truncate">{user.email}</p>
