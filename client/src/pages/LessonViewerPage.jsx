@@ -504,24 +504,26 @@ export default function LessonViewerPage() {
 
             <div className="flex items-center gap-1.5 sm:gap-2 p-1 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] shadow-sm">
 
-              <div className="flex items-center bg-[var(--bg-canvas)] p-0.5 rounded-lg border border-[var(--border)]">
+              <div className="flex items-center bg-[var(--bg-panel)] p-0.5 rounded-lg border border-[var(--border)]">
                 <button
                   onClick={() => onLangSwitch('en')}
-                  className={`px-2 sm:px-2.5 py-1 rounded-md font-mono text-xs transition-all cursor-pointer ${
+                  className={`px-2.5 py-1 rounded-md font-mono text-xs transition-all cursor-pointer ${
                     effectiveLang === 'en'
-                      ? 'bg-[var(--bg-card)] text-[var(--ink)] font-bold shadow-sm'
-                      : 'text-[var(--ink-muted)] hover:text-[var(--ink)]'
+                      ? 'bg-emerald-500 text-black font-bold shadow-sm'
+                      : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card)]'
                   }`}
+                  title="English Audio"
                 >
                   EN
                 </button>
                 <button
                   onClick={() => onLangSwitch('hi')}
-                  className={`px-2 sm:px-2.5 py-1 rounded-md font-mono text-xs transition-all cursor-pointer ${
+                  className={`px-2.5 py-1 rounded-md font-mono text-xs transition-all cursor-pointer ${
                     effectiveLang === 'hi'
                       ? 'bg-emerald-500 text-black font-bold shadow-sm'
-                      : 'text-[var(--ink-muted)] hover:text-[var(--ink)]'
+                      : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card)]'
                   }`}
+                  title="Hindi Audio"
                 >
                   हिन्दी
                 </button>
