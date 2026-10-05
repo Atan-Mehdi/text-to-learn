@@ -36,14 +36,14 @@ export default function Topbar() {
   };
 
   return (
-    <header className="h-16 sm:h-20 border-b border-[var(--border)] bg-[var(--bg-page)]/85 backdrop-blur-xl sticky top-0 z-40 px-4 sm:px-8 md:px-16 lg:px-24 flex items-center justify-between transition-colors duration-200">
+    <header className="h-16 sm:h-20 border-b border-[var(--border)] bg-[var(--bg-page)]/85 backdrop-blur-xl sticky top-0 z-40 px-3 sm:px-6 md:px-12 lg:px-20 flex items-center justify-between transition-colors duration-200 w-full max-w-full overflow-x-clip">
 
-      <div className="flex items-center">
-        <Link to="/" className="flex items-center gap-2.5 sm:gap-3.5 group cursor-pointer select-none">
+      <div className="flex items-center min-w-0 flex-shrink-0">
+        <Link to="/" className="flex items-center gap-2 sm:gap-3.5 group cursor-pointer select-none">
 
-          <div className="relative flex items-center justify-center">
+          <div className="relative flex items-center justify-center flex-shrink-0">
             <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-emerald-500/30 via-teal-500/20 to-emerald-500/0 blur-md opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300" />
-            <div className="relative w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-[#0e0e14] dark:bg-[#09090e] border border-emerald-500/40 group-hover:border-emerald-400 flex items-center justify-center overflow-hidden shadow-md transition-all">
+            <div className="relative w-8 h-8 sm:w-11 sm:h-11 rounded-xl bg-[#0e0e14] dark:bg-[#09090e] border border-emerald-500/40 group-hover:border-emerald-400 flex items-center justify-center overflow-hidden shadow-md transition-all">
               <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500/15 via-transparent to-transparent opacity-80" />
 
               <svg className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400 group-hover:scale-110 transition-transform duration-300" viewBox="0 0 24 24" fill="none">
@@ -52,19 +52,19 @@ export default function Topbar() {
                 <path d="M3 17L12 22L21 17" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" strokeOpacity="0.6" />
               </svg>
 
-              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="absolute top-1 right-1 sm:top-1.5 sm:right-1.5 w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
             </div>
           </div>
 
-          <div className="flex flex-col">
+          <div className="flex flex-col min-w-0">
             <div className="flex items-center gap-1 sm:gap-1.5">
-              <span className="font-display font-extrabold text-[18px] sm:text-[21px] tracking-[-0.03em] text-[var(--text-primary)] leading-none">
+              <span className="font-display font-extrabold text-[16px] sm:text-[21px] tracking-[-0.03em] text-[var(--text-primary)] leading-none">
                 Text
               </span>
-              <span className="px-1 sm:px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-mono font-bold uppercase tracking-wider bg-emerald-500/15 text-emerald-500 dark:text-emerald-400 border border-emerald-500/30 leading-none">
+              <span className="px-1 sm:px-1.5 py-0.5 rounded text-[8px] sm:text-[10px] font-mono font-bold uppercase tracking-wider bg-emerald-500/15 text-emerald-500 dark:text-emerald-400 border border-emerald-500/30 leading-none">
                 to
               </span>
-              <span className="font-display font-black text-[18px] sm:text-[21px] tracking-[-0.03em] bg-gradient-to-r from-emerald-500 via-emerald-400 to-teal-400 dark:from-emerald-400 dark:via-emerald-300 dark:to-teal-200 bg-clip-text text-transparent leading-none">
+              <span className="font-display font-black text-[16px] sm:text-[21px] tracking-[-0.03em] bg-gradient-to-r from-emerald-500 via-emerald-400 to-teal-400 dark:from-emerald-400 dark:via-emerald-300 dark:to-teal-200 bg-clip-text text-transparent leading-none">
                 Learn
               </span>
             </div>
@@ -78,20 +78,20 @@ export default function Topbar() {
         </Link>
       </div>
 
-      <nav className="flex items-center gap-2.5 sm:gap-4 md:gap-6">
+      <nav className="flex items-center gap-1.5 sm:gap-3 md:gap-4 flex-shrink-0">
         <a
           href="#course-catalog"
           onClick={handleCoursesClick}
-          className="flex items-center gap-2 px-3 py-1.5 text-xs md:text-sm font-sans font-medium text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+          className="flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-xl text-xs sm:text-sm font-sans font-medium text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-card)] transition-colors cursor-pointer"
         >
-          <BookOpen className="w-4 h-4 text-emerald-500" />
-          <span>Courses</span>
+          <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-500 flex-shrink-0" />
+          <span className="hidden xs:inline">Courses</span>
         </a>
 
         <button
           onClick={toggleTheme}
           aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-          className="p-2 rounded-lg border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-emerald-500/30 transition-all cursor-pointer shadow-xs"
+          className="p-1.5 sm:p-2 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:border-emerald-500/30 transition-all cursor-pointer shadow-xs flex-shrink-0"
           title={isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
         >
           {isDark ? (
@@ -104,20 +104,20 @@ export default function Topbar() {
         <div className="h-4 w-[1px] bg-[var(--border)] hidden sm:block"></div>
 
         {isAuthenticated && user ? (
-          <div className="relative" ref={dropdownRef}>
+          <div className="relative flex-shrink-0" ref={dropdownRef}>
             <button
               onClick={() => setShowDropdown(!showDropdown)}
-              className="flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-[var(--bg-card)] border border-[var(--border)] hover:border-emerald-500/40 text-xs font-sans transition-all cursor-pointer shadow-xs"
+              className="flex items-center gap-2 p-1 sm:px-3 sm:py-1.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border)] hover:border-emerald-500/40 text-xs font-sans transition-all cursor-pointer shadow-xs"
             >
               <img
                 src={user.avatarUrl || `https://api.dicebear.com/7.x/bottts/svg?seed=${user.email}`}
                 alt={user.name}
-                className="w-6 h-6 rounded-full bg-emerald-500/20 border border-emerald-500/30"
+                className="w-6 h-6 sm:w-6 sm:h-6 rounded-lg bg-emerald-500/20 border border-emerald-500/30 object-cover flex-shrink-0"
               />
-              <span className="text-[var(--text-primary)] font-semibold truncate max-w-[110px]">
+              <span className="text-[var(--text-primary)] font-semibold truncate max-w-[90px] md:max-w-[120px] hidden sm:inline">
                 {user.name}
               </span>
-              <ChevronDown className="w-3.5 h-3.5 text-zinc-400" />
+              <ChevronDown className="w-3.5 h-3.5 text-zinc-400 flex-shrink-0" />
             </button>
 
             {showDropdown && (
@@ -139,7 +139,7 @@ export default function Topbar() {
                   }}
                   className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-panel)] transition-colors cursor-pointer text-left"
                 >
-                  <BookOpen className="w-4 h-4 text-emerald-500" />
+                  <BookOpen className="w-4 h-4 text-emerald-500 flex-shrink-0" />
                   <span>Explore Courses</span>
                 </button>
 
@@ -150,7 +150,7 @@ export default function Topbar() {
                   }}
                   className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 transition-colors cursor-pointer text-left mt-1 border-t border-[var(--border)]"
                 >
-                  <LogOut className="w-4 h-4" />
+                  <LogOut className="w-4 h-4 flex-shrink-0" />
                   <span>Sign Out</span>
                 </button>
               </div>
@@ -159,9 +159,11 @@ export default function Topbar() {
         ) : (
           <button
             onClick={openAuthModal}
-            className="flex items-center gap-2 px-5 py-2 rounded-full bg-[var(--text-primary)] hover:opacity-90 text-[var(--bg-page)] text-xs font-sans font-semibold tracking-wide transition-all cursor-pointer shadow-sm hover:scale-[1.02]"
+            className="flex items-center justify-center gap-1.5 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-[var(--text-primary)] hover:opacity-90 text-[var(--bg-page)] text-xs font-sans font-semibold tracking-wide transition-all cursor-pointer shadow-sm hover:scale-[1.02] flex-shrink-0 whitespace-nowrap"
           >
-            <span>Sign in</span>
+            <User className="w-3.5 h-3.5 sm:hidden" />
+            <span className="hidden xs:inline">Sign in</span>
+            <span className="xs:hidden text-[11px]">Sign in</span>
           </button>
         )}
       </nav>

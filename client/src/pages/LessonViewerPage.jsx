@@ -39,31 +39,46 @@ function useAudioController() {
   useEffect(() => {
     if (!('speechSynthesis' in window)) return;
     const updateVoices = () => {
-      const v = window.speechSynthesis.getVoices();
-      if (v && v.length) {
-        voicesRef.current = v;
+      try {
+        const v = window.speechSynthesis.getVoices();
+        if (v && v.length) {
+          voicesRef.current = v;
+        }
+      } catch (e) {
+        // ignore
       }
     };
     updateVoices();
-    window.speechSynthesis.onvoiceschanged = updateVoices;
+    try {
+      window.speechSynthesis.onvoiceschanged = updateVoices;
+      if (window.speechSynthesis.addEventListener) {
+        window.speechSynthesis.addEventListener('voiceschanged', updateVoices);
+      }
+    } catch (e) {
+      // ignore
+    }
     return () => {
       if ('speechSynthesis' in window) {
         window.speechSynthesis.onvoiceschanged = null;
+        if (window.speechSynthesis.removeEventListener) {
+          window.speechSynthesis.removeEventListener('voiceschanged', updateVoices);
+        }
       }
     };
   }, []);
 
+  // Periodic unfreeze check for mobile browsers and Chromium-based background stalls
   useEffect(() => {
     const timer = setInterval(() => {
       if (
         'speechSynthesis' in window &&
-        statusRef.current === 'playing' &&
-        window.speechSynthesis.speaking &&
-        window.speechSynthesis.paused
+        statusRef.current === 'playing'
       ) {
-        window.speechSynthesis.resume();
+        if (window.speechSynthesis.paused) {
+          window.speechSynthesis.resume();
+        }
       }
-    }, 3000);
+    }, 1500);
     return () => clearInterval(timer);
   }, []);
 
@@ -74,8 +89,14 @@ function useAudioController() {
 
   const cancelSpeech = useCallback(() => {
     if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-      window.speechSynthesis.resume();
+      try {
+        if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+          window.speechSynthesis.cancel();
+        }
+        window.speechSynthesis.resume();
+      } catch (e) {
+        // ignore
+      }
     }
   }, []);
 
@@ -107,56 +128,93 @@ function useAudioController() {
       const lang = langRef.current;
 
       const utt = new SpeechSynthesisUtterance(text);
-      utt.lang = lang === 'hi' ? 'hi-IN' : 'en-US';
-      utt.rate = lang === 'hi' ? 0.9 : 0.95;
-      utt.volume = 1;
+      const isHindi = lang === 'hi';
+      utt.rate = isHindi ? 0.9 : 0.95;
+      utt.pitch = 1.0;
+      utt.volume = 1.0;
 
       try {
-        const voices = voicesRef.current.length ? voicesRef.current : synth.getVoices();
-        if (voices && voices.length) {
-          if (lang === 'hi') {
-            const v =
-              voices.find((voice) => (voice.lang?.startsWith('hi') || voice.lang?.includes('IN')) && voice.localService === true) ||
-              voices.find((voice) => voice.lang?.startsWith('hi') || voice.lang?.includes('IN'));
-            if (v) utt.voice = v;
+        const availableVoices = voicesRef.current.length
+          ? voicesRef.current
+          : (synth.getVoices ? synth.getVoices() : []);
+
+        let selectedVoice = null;
+        if (availableVoices && availableVoices.length > 0) {
+          if (isHindi) {
+            selectedVoice =
+              availableVoices.find((v) => (v.name?.includes('Lekha') || v.name?.includes('Sangeeta') || v.name?.includes('Google हिन्दी') || v.name?.includes('Hindi')) && !v.name?.toLowerCase().includes('siri')) ||
+              availableVoices.find((v) => v.lang?.toLowerCase().startsWith('hi') && !v.name?.toLowerCase().includes('siri')) ||
+              availableVoices.find((v) => v.lang?.toLowerCase().startsWith('hi')) ||
+              availableVoices.find((v) => v.lang?.toLowerCase().includes('in') && !v.name?.toLowerCase().includes('siri') && !v.name?.toLowerCase().includes('rishi'));
           } else {
-            const v =
-              voices.find((voice) => voice.lang?.startsWith('en') && voice.localService === true && !voice.name?.toLowerCase().includes('google')) ||
-              voices.find((voice) => voice.lang?.startsWith('en') && voice.default) ||
-              voices.find((voice) => voice.lang?.startsWith('en'));
-            if (v) utt.voice = v;
+            // Filter out macOS Siri voices that silently fail in third-party browsers
+            const reliableVoices = availableVoices.filter(
+              (v) =>
+                v.lang?.toLowerCase().startsWith('en') &&
+                !v.name?.toLowerCase().includes('siri') &&
+                !v.name?.toLowerCase().includes('rishi')
+            );
+
+            const voicePool = reliableVoices.length > 0 ? reliableVoices : availableVoices;
+
+            selectedVoice =
+              voicePool.find((v) => v.name?.includes('Samantha')) ||
+              voicePool.find((v) => v.name?.includes('Alex')) ||
+              voicePool.find((v) => v.name?.includes('Daniel')) ||
+              voicePool.find((v) => v.name?.includes('Victoria')) ||
+              voicePool.find((v) => v.name?.includes('Karen')) ||
+              voicePool.find((v) => v.name?.includes('Fred')) ||
+              voicePool.find((v) => v.name?.includes('Google')) ||
+              voicePool.find((v) => v.localService && v.lang?.toLowerCase().startsWith('en')) ||
+              voicePool.find((v) => v.lang?.toLowerCase().startsWith('en')) ||
+              voicePool[0];
           }
         }
+
+        if (selectedVoice) {
+          utt.voice = selectedVoice;
+          utt.lang = selectedVoice.lang || (isHindi ? 'hi-IN' : 'en-US');
+        } else {
+          utt.lang = isHindi ? 'hi-IN' : 'en-US';
+        }
       } catch (err) {
-        console.warn('Voice assignment fallback to default:', err);
+        utt.lang = isHindi ? 'hi-IN' : 'en-US';
       }
 
-      activeUttRef.current = utt;
-      window.__activeTTS = utt;
+      // Chromium Retain global reference to avoid GC drop
+      if (!window.__activeTTSSet) window.__activeTTSSet = new Set();
+      window.__activeTTSSet.add(utt);
 
       utt.onstart = () => {
         if (gen !== genRef.current) return;
       };
 
       utt.onend = () => {
+        window.__activeTTSSet?.delete(utt);
         if (gen !== genRef.current) return;
         idxRef.current += 1;
         speakChunk(gen);
       };
 
       utt.onerror = (e) => {
+        window.__activeTTSSet?.delete(utt);
         if (gen !== genRef.current) return;
         if (e?.error === 'canceled' || e?.error === 'interrupted') return;
-        console.warn('TTS utterance error:', e?.error);
         idxRef.current += 1;
         speakChunk(gen);
       };
 
       try {
-        synth.resume();
+        window.speechSynthesis.resume();
         synth.speak(utt);
+
+        setTimeout(() => {
+          if (window.speechSynthesis.paused) {
+            window.speechSynthesis.resume();
+          }
+        }, 100);
       } catch (err) {
-        console.error('synth.speak error:', err);
+        // ignore
       }
     },
     [setStatus]
@@ -178,6 +236,15 @@ function useAudioController() {
         chunkIdx: fromIdx,
         totalChunks: chunks.length,
       }));
+
+      // Cancel only if currently speaking
+      if ('speechSynthesis' in window && window.speechSynthesis.speaking) {
+        try {
+          window.speechSynthesis.cancel();
+        } catch (e) {
+          // ignore
+        }
+      }
 
       speakChunk(gen);
     },
@@ -296,6 +363,13 @@ export default function LessonViewerPage() {
       if (!('speechSynthesis' in window)) {
         alert('Speech synthesis is not supported in this browser.');
         return;
+      }
+
+      // Synchronously unlock and unpause speechSynthesis within user touch/click gesture
+      try {
+        window.speechSynthesis.resume();
+      } catch (e) {
+        // ignore
       }
 
       const fromIdx = resumeFromCurrent ? getPausedIdx() : 0;
