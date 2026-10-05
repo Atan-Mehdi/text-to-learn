@@ -75,10 +75,14 @@ export function AuthProvider({ children }) {
       setLoading(false);
     };
 
+    if (auth0?.error) {
+      console.error('Auth0 Authentication Error:', auth0.error);
+    }
+
     if (!auth0?.isLoading) {
       initLocalAuth();
     }
-  }, [auth0?.isAuthenticated, auth0?.user, auth0?.isLoading]);
+  }, [auth0?.isAuthenticated, auth0?.user, auth0?.isLoading, auth0?.error]);
 
   const activeUser = (auth0?.isAuthenticated && auth0?.user) ? {
     id: auth0.user.sub,
