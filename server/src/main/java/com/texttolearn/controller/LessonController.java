@@ -9,6 +9,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/lessons")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class LessonController {
 
     private final CourseService courseService;

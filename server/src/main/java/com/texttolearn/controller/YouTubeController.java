@@ -8,6 +8,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/youtube")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class YouTubeController {
 
     private final YouTubeService youTubeService;
