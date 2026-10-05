@@ -29,6 +29,7 @@ export function AuthProvider({ children }) {
       };
       setLocalUser(oauthUser);
       localStorage.setItem('ttl_auth_user', JSON.stringify(oauthUser));
+      setIsAuthModalOpen(false);
 
       if (email) {
         syncOAuthUserApi(name, email, avatarUrl, sub)
