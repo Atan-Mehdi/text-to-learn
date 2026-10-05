@@ -82,12 +82,12 @@ export default function CoursePage() {
   return (
     <div className="min-h-[calc(100vh-4rem)] pb-32">
 
-      <section className="relative px-6 md:px-12 py-12 border-b border-[var(--border)] bg-[var(--bg-card)]">
+      <section className="relative px-4 sm:px-8 md:px-12 py-8 sm:py-12 border-b border-[var(--border)] bg-[var(--bg-card)]">
         <div className="max-w-5xl mx-auto">
 
           <Link
             to="/"
-            className="inline-flex items-center gap-1.5 text-xs font-mono text-[var(--text-dim)] hover:text-[var(--text-primary)] mb-5 transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs font-mono text-[var(--text-dim)] hover:text-[var(--text-primary)] mb-4 sm:mb-5 transition-colors"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Back to All Courses</span>
@@ -104,15 +104,15 @@ export default function CoursePage() {
             ))}
           </div>
 
-          <h1 className="text-3xl md:text-5xl font-extrabold text-[var(--text-primary)] tracking-tight leading-tight max-w-3xl">
+          <h1 className="text-2xl sm:text-3xl md:text-5xl font-extrabold text-[var(--text-primary)] tracking-tight leading-tight max-w-3xl">
             {course.title}
           </h1>
 
-          <p className="mt-4 text-sm md:text-base text-[var(--text-muted)] max-w-2xl leading-relaxed font-normal">
+          <p className="mt-3 sm:mt-4 text-xs sm:text-sm md:text-base text-[var(--text-muted)] max-w-2xl leading-relaxed font-normal">
             {course.description}
           </p>
 
-          <div className="mt-8 flex flex-wrap items-center gap-4">
+          <div className="mt-6 sm:mt-8 flex flex-wrap items-center gap-3 sm:gap-4">
             {firstLesson && (
               <button
                 onClick={() =>
@@ -120,7 +120,7 @@ export default function CoursePage() {
                     `/courses/${course.id}/module/${firstModule.id}/lesson/${firstLesson.id}`
                   )
                 }
-                className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[var(--text-primary)] hover:opacity-90 text-[var(--bg-page)] text-xs font-mono uppercase tracking-wider font-bold transition-all hover:scale-[1.02] cursor-pointer shadow-md"
+                className="flex items-center gap-2 px-5 sm:px-6 py-2.5 rounded-xl bg-[var(--text-primary)] hover:opacity-90 text-[var(--bg-page)] text-xs font-mono uppercase tracking-wider font-bold transition-all hover:scale-[1.02] cursor-pointer shadow-md"
               >
                 <Play className="w-3.5 h-3.5 fill-current" />
                 <span>Start Learning</span>
@@ -132,7 +132,7 @@ export default function CoursePage() {
                 type="button"
                 onClick={handleDeleteCourse}
                 disabled={deleting}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-rose-500/30 hover:border-rose-500 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-mono uppercase tracking-wider font-semibold transition-all cursor-pointer shadow-xs hover:scale-[1.02] disabled:opacity-50"
+                className="flex items-center gap-2 px-3.5 sm:px-4 py-2.5 rounded-xl border border-rose-500/30 hover:border-rose-500 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-xs font-mono uppercase tracking-wider font-semibold transition-all cursor-pointer shadow-xs hover:scale-[1.02] disabled:opacity-50"
               >
                 {deleting ? (
                   <>
@@ -148,11 +148,11 @@ export default function CoursePage() {
               </button>
             )}
 
-            <div className="flex items-center gap-3 text-xs font-mono text-[var(--text-dim)]">
-              <span className="px-3 py-1.5 rounded-lg bg-[var(--bg-panel)] border border-[var(--border)]">
+            <div className="flex items-center gap-2 sm:gap-3 text-xs font-mono text-[var(--text-dim)]">
+              <span className="px-2.5 sm:px-3 py-1.5 rounded-lg bg-[var(--bg-panel)] border border-[var(--border)]">
                 {course.modules?.length || 0} Modules
               </span>
-              <span className="px-3 py-1.5 rounded-lg bg-[var(--bg-panel)] border border-[var(--border)]">
+              <span className="px-2.5 sm:px-3 py-1.5 rounded-lg bg-[var(--bg-panel)] border border-[var(--border)]">
                 {totalLessons} Lessons
               </span>
             </div>
@@ -160,23 +160,23 @@ export default function CoursePage() {
         </div>
       </section>
 
-      <section className="max-w-5xl mx-auto px-6 md:px-12 mt-12">
-        <div className="flex items-center justify-between pb-4 border-b border-[var(--border)] mb-8">
+      <section className="max-w-5xl mx-auto px-4 sm:px-8 md:px-12 mt-8 sm:mt-12">
+        <div className="flex items-center justify-between pb-4 border-b border-[var(--border)] mb-6 sm:mb-8">
           <div>
             <div className="text-xs font-mono text-emerald-400 uppercase tracking-wider mb-1">
-
+              // SYLLABUS HIERARCHY
             </div>
-            <h2 className="text-xl font-bold text-[var(--text-primary)]">
+            <h2 className="text-lg sm:text-xl font-bold text-[var(--text-primary)]">
               Curriculum Modules & Lessons
             </h2>
           </div>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {course.modules?.map((module, mIdx) => (
             <div
               key={module.id || mIdx}
-              className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-6 md:p-7 shadow-sm"
+              className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 sm:p-6 md:p-7 shadow-sm"
             >
 
               <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-[var(--border)] mb-5 gap-3">

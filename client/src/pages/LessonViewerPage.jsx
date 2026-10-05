@@ -16,6 +16,8 @@ import {
   CheckCircle2,
   ChevronRight,
   Loader2,
+  Layers,
+  Menu,
 } from 'lucide-react';
 
 function useAudioController() {
@@ -236,6 +238,7 @@ export default function LessonViewerPage() {
   const [hinglishText, setHinglishText] = useState('');
   const [loadingHinglish, setLoadingHinglish] = useState(false);
   const [showHinglish, setShowHinglish] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   const [selectedLang, setSelectedLang] = useState('en');
   const cachedChunks = useRef({ en: null, hi: null });
@@ -388,32 +391,49 @@ export default function LessonViewerPage() {
 
   return (
     <div className="flex min-h-[calc(100vh-5rem)]">
-      <Sidebar course={course} activeModuleId={moduleId} activeLessonId={lessonId} />
+      <Sidebar
+        course={course}
+        activeModuleId={moduleId}
+        activeLessonId={lessonId}
+        isOpen={mobileSidebarOpen}
+        onClose={() => setMobileSidebarOpen(false)}
+      />
 
-      <main className="flex-1 p-6 md:p-12 max-w-5xl mx-auto overflow-y-auto pb-32">
+      <main className="flex-1 px-4 py-6 sm:px-8 md:p-12 max-w-5xl mx-auto overflow-y-auto pb-32 w-full min-w-0">
 
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-8 pb-6 border-b border-[var(--border)]">
-          <div className="flex items-center gap-2 font-mono text-xs text-[var(--ink-muted)]">
-            <Link
-              to={`/courses/${courseId}`}
-              className="hover:text-emerald-500 transition-colors"
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8 pb-5 sm:pb-6 border-b border-[var(--border)]">
+          <div className="flex items-center justify-between gap-3 w-full sm:w-auto">
+            <div className="flex items-center gap-2 font-mono text-xs text-[var(--ink-muted)] min-w-0">
+              <Link
+                to={`/courses/${courseId}`}
+                className="hover:text-emerald-500 transition-colors truncate max-w-[120px] sm:max-w-[180px]"
+              >
+                {course?.title || 'Course'}
+              </Link>
+              <ChevronRight className="w-3.5 h-3.5 text-[var(--ink-dim)] flex-shrink-0" />
+              <span className="text-[var(--ink)] font-semibold truncate max-w-[140px] sm:max-w-[220px]">
+                {lesson?.title || 'Lesson'}
+              </span>
+            </div>
+
+            <button
+              onClick={() => setMobileSidebarOpen(true)}
+              className="lg:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] text-xs font-mono text-[var(--ink)] hover:border-emerald-500/40 transition-all cursor-pointer shadow-xs flex-shrink-0"
+              title="View Modules & Lessons"
             >
-              {course?.title || 'Course'}
-            </Link>
-            <ChevronRight className="w-3.5 h-3.5 text-[var(--ink-dim)]" />
-            <span className="text-[var(--ink)] font-semibold truncate max-w-[240px]">
-              {lesson?.title || 'Lesson'}
-            </span>
+              <Layers className="w-3.5 h-3.5 text-emerald-500" />
+              <span>Syllabus</span>
+            </button>
           </div>
 
-          <div className="flex items-center gap-2.5 flex-wrap">
+          <div className="flex items-center gap-2 sm:gap-2.5 flex-wrap w-full sm:w-auto justify-start sm:justify-end">
 
-            <div className="flex items-center gap-2 p-1 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] shadow-sm">
+            <div className="flex items-center gap-1.5 sm:gap-2 p-1 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] shadow-sm">
 
               <div className="flex items-center bg-[var(--bg-canvas)] p-0.5 rounded-lg border border-[var(--border)]">
                 <button
                   onClick={() => onLangSwitch('en')}
-                  className={`px-2.5 py-1 rounded-md font-mono text-xs transition-all cursor-pointer ${
+                  className={`px-2 sm:px-2.5 py-1 rounded-md font-mono text-xs transition-all cursor-pointer ${
                     effectiveLang === 'en'
                       ? 'bg-[var(--bg-card)] text-[var(--ink)] font-bold shadow-sm'
                       : 'text-[var(--ink-muted)] hover:text-[var(--ink)]'
@@ -423,7 +443,7 @@ export default function LessonViewerPage() {
                 </button>
                 <button
                   onClick={() => onLangSwitch('hi')}
-                  className={`px-2.5 py-1 rounded-md font-mono text-xs transition-all cursor-pointer ${
+                  className={`px-2 sm:px-2.5 py-1 rounded-md font-mono text-xs transition-all cursor-pointer ${
                     effectiveLang === 'hi'
                       ? 'bg-emerald-500 text-black font-bold shadow-sm'
                       : 'text-[var(--ink-muted)] hover:text-[var(--ink)]'
@@ -436,7 +456,7 @@ export default function LessonViewerPage() {
               {status === 'playing' ? (
                 <button
                   onClick={audioPause}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500 text-black font-mono text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer"
+                  className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-amber-500 text-black font-mono text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer"
                 >
                   <Pause className="w-3 h-3 fill-black" />
                   <span>Pause</span>
@@ -444,7 +464,7 @@ export default function LessonViewerPage() {
               ) : status === 'paused' ? (
                 <button
                   onClick={() => handlePlay(effectiveLang, true)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-mono text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer"
+                  className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-mono text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer"
                 >
                   <Play className="w-3 h-3 fill-black" />
                   <span>Resume</span>
@@ -452,7 +472,7 @@ export default function LessonViewerPage() {
               ) : (
                 <button
                   onClick={() => handlePlay(effectiveLang, false)}
-                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-mono text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer shadow-sm"
+                  className="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-mono text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer shadow-sm"
                 >
                   <Volume2 className="w-3.5 h-3.5" />
                   <span>Listen</span>
@@ -470,7 +490,7 @@ export default function LessonViewerPage() {
               )}
 
               {status === 'playing' && (
-                <div className="flex items-center gap-0.5 px-1.5">
+                <div className="hidden xs:flex items-center gap-0.5 px-1.5">
                   <span className="w-0.5 h-3 bg-emerald-500 animate-soundwave-1" />
                   <span className="w-0.5 h-4 bg-emerald-400 animate-soundwave-2" />
                   <span className="w-0.5 h-2 bg-emerald-500 animate-soundwave-3" />
@@ -487,7 +507,7 @@ export default function LessonViewerPage() {
 
             <button
               onClick={handleToggleHinglish}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-lg border font-mono text-xs font-semibold transition-all cursor-pointer ${
+              className={`flex items-center gap-2 px-3 sm:px-3.5 py-2 rounded-xl border font-mono text-xs font-semibold transition-all cursor-pointer ${
                 showHinglish
                   ? 'bg-emerald-500/15 border-emerald-500 text-emerald-500'
                   : 'bg-[var(--bg-card)] hover:bg-[var(--bg-card-hover)] text-[var(--ink)] border-[var(--border)] hover:border-emerald-500/40'
@@ -502,8 +522,8 @@ export default function LessonViewerPage() {
         </div>
 
         {showHinglish && (
-          <div className="mb-10 p-6 md:p-8 rounded-2xl border border-emerald-500/30 bg-[#0c1511] text-emerald-50 shadow-sm transition-all">
-            <div className="flex items-center justify-between pb-4 mb-4 border-b border-emerald-500/20 gap-4">
+          <div className="mb-8 sm:mb-10 p-5 sm:p-8 rounded-2xl border border-emerald-500/30 bg-[#0c1511] text-emerald-50 shadow-sm transition-all">
+            <div className="flex items-center justify-between pb-4 mb-4 border-b border-emerald-500/20 gap-4 flex-wrap">
               <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-emerald-400">
                 <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
                 <span>Hinglish Audio & Overview</span>
@@ -545,13 +565,13 @@ export default function LessonViewerPage() {
         ) : (
           <div
             ref={lessonRef}
-            className="p-6 md:p-12 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] transition-colors"
+            className="p-5 sm:p-8 md:p-12 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] transition-colors"
           >
             <LessonRenderer lesson={lesson} />
           </div>
         )}
 
-        <div className="mt-12 pt-6 border-t border-[var(--border)] flex items-center justify-between gap-4">
+        <div className="mt-10 sm:mt-12 pt-6 border-t border-[var(--border)] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
           {prevLesson ? (
             <button
               onClick={() =>
@@ -559,15 +579,15 @@ export default function LessonViewerPage() {
                   `/courses/${courseId}/module/${prevLesson.moduleId}/lesson/${prevLesson.id}`
                 )
               }
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--bg-card)] hover:bg-[var(--bg-card-hover)] text-[var(--ink)] border border-[var(--border)] font-mono text-xs font-semibold transition-all cursor-pointer hover:border-emerald-500/40"
+              className="flex items-center justify-center sm:justify-start gap-2 px-4 py-2.5 rounded-xl bg-[var(--bg-card)] hover:bg-[var(--bg-card-hover)] text-[var(--ink)] border border-[var(--border)] font-mono text-xs font-semibold transition-all cursor-pointer hover:border-emerald-500/40"
             >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span className="truncate max-w-[160px] md:max-w-[220px]">
+              <ArrowLeft className="w-3.5 h-3.5 flex-shrink-0" />
+              <span className="truncate max-w-[200px] sm:max-w-[220px]">
                 {prevLesson.title}
               </span>
             </button>
           ) : (
-            <div />
+            <div className="hidden sm:block" />
           )}
 
           {nextLesson ? (
@@ -577,19 +597,19 @@ export default function LessonViewerPage() {
                   `/courses/${courseId}/module/${nextLesson.moduleId}/lesson/${nextLesson.id}`
                 )
               }
-              className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-mono text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer shadow-sm"
+              className="flex items-center justify-center sm:justify-end gap-2 px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-mono text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer shadow-sm"
             >
-              <span className="truncate max-w-[160px] md:max-w-[220px]">
+              <span className="truncate max-w-[200px] sm:max-w-[220px]">
                 {nextLesson.title}
               </span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <ArrowRight className="w-3.5 h-3.5 flex-shrink-0" />
             </button>
           ) : (
             <Link
               to={`/courses/${courseId}`}
-              className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-mono text-xs font-semibold uppercase tracking-wider transition-all shadow-sm"
+              className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-mono text-xs font-semibold uppercase tracking-wider transition-all shadow-sm"
             >
-              <CheckCircle2 className="w-4 h-4" />
+              <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
               <span>Complete Course</span>
             </Link>
           )}

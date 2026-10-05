@@ -36,17 +36,17 @@ export default function Topbar() {
   };
 
   return (
-    <header className="h-20 border-b border-[var(--border)] bg-[var(--bg-page)]/85 backdrop-blur-xl sticky top-0 z-40 px-6 sm:px-10 md:px-16 lg:px-24 flex items-center justify-between transition-colors duration-200">
+    <header className="h-16 sm:h-20 border-b border-[var(--border)] bg-[var(--bg-page)]/85 backdrop-blur-xl sticky top-0 z-40 px-4 sm:px-8 md:px-16 lg:px-24 flex items-center justify-between transition-colors duration-200">
 
       <div className="flex items-center">
-        <Link to="/" className="flex items-center gap-3.5 group cursor-pointer select-none">
+        <Link to="/" className="flex items-center gap-2.5 sm:gap-3.5 group cursor-pointer select-none">
 
           <div className="relative flex items-center justify-center">
             <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-emerald-500/30 via-teal-500/20 to-emerald-500/0 blur-md opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300" />
-            <div className="relative w-11 h-11 rounded-xl bg-[#0e0e14] dark:bg-[#09090e] border border-emerald-500/40 group-hover:border-emerald-400 flex items-center justify-center overflow-hidden shadow-md transition-all">
+            <div className="relative w-9 h-9 sm:w-11 sm:h-11 rounded-xl bg-[#0e0e14] dark:bg-[#09090e] border border-emerald-500/40 group-hover:border-emerald-400 flex items-center justify-center overflow-hidden shadow-md transition-all">
               <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500/15 via-transparent to-transparent opacity-80" />
 
-              <svg className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform duration-300" viewBox="0 0 24 24" fill="none">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400 group-hover:scale-110 transition-transform duration-300" viewBox="0 0 24 24" fill="none">
                 <path d="M12 2L3 7L12 12L21 7L12 2Z" fill="currentColor" fillOpacity="0.9" />
                 <path d="M3 12L12 17L21 12" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
                 <path d="M3 17L12 22L21 17" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" strokeOpacity="0.6" />
@@ -57,18 +57,18 @@ export default function Topbar() {
           </div>
 
           <div className="flex flex-col">
-            <div className="flex items-center gap-1.5">
-              <span className="font-display font-extrabold text-[21px] tracking-[-0.03em] text-[var(--text-primary)] leading-none">
+            <div className="flex items-center gap-1 sm:gap-1.5">
+              <span className="font-display font-extrabold text-[18px] sm:text-[21px] tracking-[-0.03em] text-[var(--text-primary)] leading-none">
                 Text
               </span>
-              <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider bg-emerald-500/15 text-emerald-500 dark:text-emerald-400 border border-emerald-500/30 leading-none">
+              <span className="px-1 sm:px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-mono font-bold uppercase tracking-wider bg-emerald-500/15 text-emerald-500 dark:text-emerald-400 border border-emerald-500/30 leading-none">
                 to
               </span>
-              <span className="font-display font-black text-[21px] tracking-[-0.03em] bg-gradient-to-r from-emerald-500 via-emerald-400 to-teal-400 dark:from-emerald-400 dark:via-emerald-300 dark:to-teal-200 bg-clip-text text-transparent leading-none">
+              <span className="font-display font-black text-[18px] sm:text-[21px] tracking-[-0.03em] bg-gradient-to-r from-emerald-500 via-emerald-400 to-teal-400 dark:from-emerald-400 dark:via-emerald-300 dark:to-teal-200 bg-clip-text text-transparent leading-none">
                 Learn
               </span>
             </div>
-            <div className="flex items-center gap-1.5 mt-1">
+            <div className="hidden sm:flex items-center gap-1.5 mt-1">
               <span className="w-1 h-1 rounded-full bg-emerald-500"></span>
               <span className="text-[10px] font-mono uppercase tracking-[0.18em] text-[var(--text-muted)] font-medium">
                 Make Your Own Course
@@ -78,7 +78,7 @@ export default function Topbar() {
         </Link>
       </div>
 
-      <nav className="flex items-center gap-4 sm:gap-6">
+      <nav className="flex items-center gap-2.5 sm:gap-4 md:gap-6">
         <a
           href="#course-catalog"
           onClick={handleCoursesClick}

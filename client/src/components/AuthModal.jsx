@@ -63,20 +63,20 @@ export default function AuthModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
-      <div className="relative w-full max-w-md rounded-3xl bg-[var(--bg-card)] border border-[var(--border)] shadow-2xl overflow-hidden text-[var(--text-primary)] transition-all">
+    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
+      <div className="relative w-full max-w-md max-h-[92vh] overflow-y-auto rounded-3xl bg-[var(--bg-card)] border border-[var(--border)] shadow-2xl text-[var(--text-primary)] transition-all">
 
-        <div className="h-1.5 w-full bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-600" />
+        <div className="h-1.5 w-full bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-600 sticky top-0 z-10" />
 
         <button
           onClick={closeAuthModal}
-          className="absolute top-4 right-4 p-2 rounded-full bg-[var(--bg-panel)] hover:bg-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+          className="absolute top-4 right-4 p-2 rounded-full bg-[var(--bg-panel)] hover:bg-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer z-20"
           title="Close dialog"
         >
           <X className="w-4 h-4" />
         </button>
 
-        <div className="p-6 sm:p-8">
+        <div className="p-5 sm:p-8">
 
           <div className="mb-6">
             <h3 className="font-display font-bold text-2xl tracking-tight text-[var(--text-primary)]">

@@ -240,42 +240,42 @@ export default function HomePage() {
 
       <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-emerald-400/90 to-transparent shadow-[0_0_15px_rgba(16,185,129,0.9)] pointer-events-none animate-scanline -z-0" />
 
-      <section className="relative px-6 md:px-12 pt-6 md:pt-10 pb-16 z-10">
+      <section className="relative px-4 sm:px-6 md:px-12 pt-6 md:pt-10 pb-12 sm:pb-16 z-10">
         <div className="max-w-7xl mx-auto">
 
-          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border border-[var(--border)] bg-[var(--bg-card)]/90 backdrop-blur-md text-xs md:text-sm font-mono text-[var(--text-muted)] mb-5 shadow-xs">
+          <div className="inline-flex items-center gap-2.5 px-3.5 sm:px-4 py-1.5 rounded-full border border-[var(--border)] bg-[var(--bg-card)]/90 backdrop-blur-md text-[11px] sm:text-xs md:text-sm font-mono text-[var(--text-muted)] mb-5 shadow-xs">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             <span className="text-[var(--text-primary)] font-semibold uppercase tracking-wider">
               AI-POWERED COURSE GENERATOR
             </span>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10 lg:gap-14 items-start">
 
             <div className="lg:col-span-7 pt-1">
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[62px] xl:text-[68px] font-extrabold tracking-[-0.035em] text-[var(--text-primary)] leading-[1.12]">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[62px] xl:text-[68px] font-extrabold tracking-[-0.035em] text-[var(--text-primary)] leading-[1.15] sm:leading-[1.12]">
                 Synthesize any curriculum with{' '}
                 <span className="text-emerald-500 dark:text-emerald-400">precision intelligence.</span>
               </h1>
 
-              <p className="mt-6 text-base sm:text-lg md:text-xl text-[var(--text-muted)] max-w-2xl leading-[1.65] font-normal">
+              <p className="mt-4 sm:mt-6 text-sm sm:text-base md:text-xl text-[var(--text-muted)] max-w-2xl leading-[1.65] font-normal">
                 Autonomous course structuring with modular syllabi, interactive code environments, natural bilingual speech synthesis, and vector export.
               </p>
 
-              <div className="mt-8 pt-2">
+              <div className="mt-6 sm:mt-8 pt-2">
                 <div className="flex items-center gap-2 mb-3">
                   <Zap className="w-3.5 h-3.5 text-emerald-500" />
                   <span className="text-xs font-mono uppercase tracking-wider text-[var(--text-dim)] font-semibold">
                     QUICK DISPATCH PROMPTS:
                   </span>
                 </div>
-                <div className="flex flex-wrap gap-2.5">
+                <div className="flex flex-wrap gap-2 sm:gap-2.5">
                   {SAMPLE_PROMPTS.map((item, idx) => (
                     <button
                       key={idx}
                       type="button"
                       onClick={() => setTopic(item.text)}
-                      className="px-3.5 py-2 rounded-xl border border-[var(--border)] bg-[var(--bg-card)]/80 backdrop-blur-sm hover:border-emerald-500/50 hover:bg-[var(--bg-card-hover)] text-xs md:text-sm font-mono text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-all cursor-pointer shadow-xs hover:scale-[1.02]"
+                      className="px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl border border-[var(--border)] bg-[var(--bg-card)]/80 backdrop-blur-sm hover:border-emerald-500/50 hover:bg-[var(--bg-card-hover)] text-xs md:text-sm font-mono text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-all cursor-pointer shadow-xs hover:scale-[1.02]"
                     >
                       <span className="text-emerald-500 mr-1.5 font-bold">[{item.tag}]</span>
                       {item.text}
@@ -286,7 +286,7 @@ export default function HomePage() {
             </div>
 
             <div className="lg:col-span-5">
-              <div className="rounded-3xl border border-[var(--border)] bg-[var(--bg-card)]/90 p-7 md:p-8 shadow-2xl relative backdrop-blur-xl hover:border-emerald-500/30 transition-all">
+              <div className="rounded-3xl border border-[var(--border)] bg-[var(--bg-card)]/90 p-5 sm:p-7 md:p-8 shadow-2xl relative backdrop-blur-xl hover:border-emerald-500/30 transition-all">
                 <div className="flex items-center justify-between pb-4 mb-5 border-b border-[var(--border)] font-mono text-xs md:text-sm">
                   <span className="text-[var(--text-muted)] flex items-center gap-2 font-medium">
                     <Terminal className="w-4 h-4 text-emerald-500" />
@@ -297,7 +297,7 @@ export default function HomePage() {
                   </span>
                 </div>
 
-                <form onSubmit={handleGenerate} className="space-y-5">
+                <form onSubmit={handleGenerate} className="space-y-4 sm:space-y-5">
                   <div>
                     <label className="text-xs md:text-sm font-mono uppercase tracking-wider text-[var(--text-muted)] block mb-2.5 font-semibold">
                       Topic or Skill Definition:
@@ -307,7 +307,7 @@ export default function HomePage() {
                       value={topic}
                       onChange={(e) => setTopic(e.target.value)}
                       placeholder="e.g., C++ Memory Allocation, Distributed Cache Systems, Zero-Knowledge Proofs..."
-                      className="w-full bg-[var(--bg-panel)] border border-[var(--border)] rounded-2xl p-4 text-sm md:text-base font-sans text-[var(--text-primary)] placeholder-[var(--text-dim)] focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 transition-all resize-none leading-relaxed"
+                      className="w-full bg-[var(--bg-panel)] border border-[var(--border)] rounded-2xl p-3.5 sm:p-4 text-sm md:text-base font-sans text-[var(--text-primary)] placeholder-[var(--text-dim)] focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 transition-all resize-none leading-relaxed"
                       disabled={loading}
                     />
                   </div>
@@ -315,7 +315,7 @@ export default function HomePage() {
                   <button
                     type="submit"
                     disabled={loading || !topic.trim()}
-                    className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-black text-xs md:text-sm font-mono uppercase tracking-wider font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shadow-md hover:scale-[1.01]"
+                    className="w-full flex items-center justify-center gap-2.5 py-3 sm:py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-black text-xs md:text-sm font-mono uppercase tracking-wider font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shadow-md hover:scale-[1.01]"
                   >
                     {loading ? (
                       <>
@@ -337,7 +337,7 @@ export default function HomePage() {
                   </div>
                 )}
 
-                <div className="mt-5 pt-4 border-t border-[var(--border)] flex items-center justify-between text-[11px] md:text-xs font-mono text-[var(--text-dim)]">
+                <div className="mt-5 pt-4 border-t border-[var(--border)] flex items-center justify-between text-[10px] sm:text-[11px] md:text-xs font-mono text-[var(--text-dim)]">
                   <span>MODULAR ENGINE</span>
                   <span>•</span>
                   <span>BILINGUAL AUDIO</span>
@@ -350,13 +350,13 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="px-6 md:px-12 py-10 max-w-7xl mx-auto relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-7">
-          <div className="p-7 md:p-8 rounded-3xl border border-[var(--border)] bg-[var(--bg-card)]/80 backdrop-blur-md hover:border-emerald-500/40 transition-all shadow-xs hover:-translate-y-1 duration-200">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 font-mono text-sm font-bold mb-5">
+      <section className="px-4 sm:px-6 md:px-12 py-8 sm:py-10 max-w-7xl mx-auto relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-7">
+          <div className="p-5 sm:p-7 md:p-8 rounded-3xl border border-[var(--border)] bg-[var(--bg-card)]/80 backdrop-blur-md hover:border-emerald-500/40 transition-all shadow-xs hover:-translate-y-1 duration-200">
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 font-mono text-sm font-bold mb-4 sm:mb-5">
               01
             </div>
-            <h3 className="text-lg md:text-xl font-bold text-[var(--text-primary)] mb-2.5 leading-snug">
+            <h3 className="text-base sm:text-lg md:text-xl font-bold text-[var(--text-primary)] mb-2 sm:mb-2.5 leading-snug">
               Modular Curriculum Matrix
             </h3>
             <p className="text-xs md:text-sm text-[var(--text-muted)] leading-relaxed font-normal">
@@ -364,11 +364,11 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="p-7 md:p-8 rounded-3xl border border-[var(--border)] bg-[var(--bg-card)]/80 backdrop-blur-md hover:border-emerald-500/40 transition-all shadow-xs hover:-translate-y-1 duration-200">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 font-mono text-sm font-bold mb-5">
+          <div className="p-5 sm:p-7 md:p-8 rounded-3xl border border-[var(--border)] bg-[var(--bg-card)]/80 backdrop-blur-md hover:border-emerald-500/40 transition-all shadow-xs hover:-translate-y-1 duration-200">
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 font-mono text-sm font-bold mb-4 sm:mb-5">
               02
             </div>
-            <h3 className="text-lg md:text-xl font-bold text-[var(--text-primary)] mb-2.5 leading-snug">
+            <h3 className="text-base sm:text-lg md:text-xl font-bold text-[var(--text-primary)] mb-2 sm:mb-2.5 leading-snug">
               Bilingual Speech Engine
             </h3>
             <p className="text-xs md:text-sm text-[var(--text-muted)] leading-relaxed font-normal">
@@ -376,11 +376,11 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="p-7 md:p-8 rounded-3xl border border-[var(--border)] bg-[var(--bg-card)]/80 backdrop-blur-md hover:border-emerald-500/40 transition-all shadow-xs hover:-translate-y-1 duration-200">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 font-mono text-sm font-bold mb-5">
+          <div className="p-5 sm:p-7 md:p-8 rounded-3xl border border-[var(--border)] bg-[var(--bg-card)]/80 backdrop-blur-md hover:border-emerald-500/40 transition-all shadow-xs hover:-translate-y-1 duration-200">
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 font-mono text-sm font-bold mb-4 sm:mb-5">
               03
             </div>
-            <h3 className="text-lg md:text-xl font-bold text-[var(--text-primary)] mb-2.5 leading-snug">
+            <h3 className="text-base sm:text-lg md:text-xl font-bold text-[var(--text-primary)] mb-2 sm:mb-2.5 leading-snug">
               Vector PDF Exporter
             </h3>
             <p className="text-xs md:text-sm text-[var(--text-muted)] leading-relaxed font-normal">
@@ -390,7 +390,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section id="course-catalog" className="px-6 md:px-12 pt-8 max-w-7xl mx-auto relative z-10 scroll-mt-24">
+      <section id="course-catalog" className="px-4 sm:px-6 md:px-12 pt-6 sm:pt-8 max-w-7xl mx-auto relative z-10 scroll-mt-24">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 mb-8">
           <div>
             <div className="text-xs md:text-sm font-mono text-emerald-500 uppercase tracking-widest mb-1.5 font-semibold">
