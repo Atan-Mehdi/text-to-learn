@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { BookOpen, Layers, ArrowLeft, Play, Sparkles, CheckCircle2, Trash2 } from 'lucide-react';
+import { BookOpen, Layers, ArrowLeft, Play, Sparkles, CheckCircle2, Trash2, Lock, LogIn } from 'lucide-react';
 import { getCourse, deleteCourseApi } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 
@@ -13,17 +13,30 @@ const INITIAL_COURSE_IDS = [
 export default function CoursePage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, openAuthModal } = useAuth();
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
+  const [isForbidden, setIsForbidden] = useState(false);
 
   useEffect(() => {
-    getCourse(id)
-      .then((data) => setCourse(data))
-      .catch((err) => console.error(err))
+    setLoading(true);
+    setIsForbidden(false);
+    const userIdentifier = user?.email || user?.name || null;
+    getCourse(id, userIdentifier)
+      .then((data) => {
+        setCourse(data);
+        setIsForbidden(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        if (err.response?.status === 403 || err.response?.data?.isPrivate) {
+          setIsForbidden(true);
+        }
+        setCourse(null);
+      })
       .finally(() => setLoading(false));
-  }, [id]);
+  }, [id, user]);
 
   const isDeletable = course && !INITIAL_COURSE_IDS.includes(course.id) && (
     user?.role === 'ADMIN' ||
@@ -41,7 +54,8 @@ export default function CoursePage() {
 
     setDeleting(true);
     try {
-      await deleteCourseApi(course.id);
+      const userIdentifier = user?.email || user?.name || null;
+      await deleteCourseApi(course.id, userIdentifier);
       navigate('/');
     } catch (err) {
       console.error('Failed to delete course', err);
@@ -55,6 +69,42 @@ export default function CoursePage() {
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] gap-3 text-[var(--text-muted)]">
         <div className="w-8 h-8 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin" />
         <span className="text-xs font-mono tracking-wider">LOADING SYLLABUS...</span>
+      </div>
+    );
+  }
+
+  if (isForbidden) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] px-6 py-20 text-center">
+        <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mb-6 shadow-sm">
+          <Lock className="w-8 h-8 text-amber-400" />
+        </div>
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[10px] font-mono uppercase tracking-widest mb-3">
+          // Private Course
+        </div>
+        <h2 className="text-2xl sm:text-3xl font-extrabold text-[var(--text-primary)] max-w-md tracking-tight">
+          Restricted Access
+        </h2>
+        <p className="text-xs sm:text-sm text-[var(--text-muted)] mt-2.5 max-w-md leading-relaxed">
+          This course was generated privately by a user and is only available to its creator. Please log in with the creator account to access this curriculum.
+        </p>
+
+        <div className="flex flex-wrap items-center justify-center gap-3 mt-8">
+          <button
+            onClick={() => openAuthModal('login')}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-mono uppercase tracking-wider font-bold transition-all shadow-md cursor-pointer hover:scale-[1.02]"
+          >
+            <LogIn className="w-3.5 h-3.5" />
+            <span>Sign In to Access</span>
+          </button>
+          <Link
+            to="/"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[var(--bg-panel)] hover:bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text-primary)] text-xs font-mono uppercase tracking-wider font-medium transition-all"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>Return to Catalog</span>
+          </Link>
+        </div>
       </div>
     );
   }

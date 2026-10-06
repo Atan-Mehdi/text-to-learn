@@ -117,12 +117,17 @@ public class CourseService {
                 continue;
             }
             String creator = c.getCreator();
-            if (creator == null || "SYSTEM".equalsIgnoreCase(creator) || "anonymous".equalsIgnoreCase(creator)) {
+            if (creator != null && "SYSTEM".equalsIgnoreCase(creator)) {
                 visible.add(c);
                 continue;
             }
-            if (!userClean.isEmpty() && (creator.equalsIgnoreCase(userClean) || userClean.contains(creator.toLowerCase()) || creator.toLowerCase().contains(userClean))) {
-                visible.add(c);
+            if (!userClean.isEmpty() && creator != null && !creator.trim().isEmpty() && !"anonymous".equalsIgnoreCase(creator)) {
+                if ("operator@text-to-learn.ai".equals(userClean) ||
+                    creator.equalsIgnoreCase(userClean) ||
+                    userClean.contains(creator.toLowerCase()) ||
+                    creator.toLowerCase().contains(userClean)) {
+                    visible.add(c);
+                }
             }
         }
         return visible;
@@ -140,6 +145,29 @@ public class CourseService {
             } catch (Exception ignored) {}
         }
         return Optional.ofNullable(memoryCourseStore.get(id));
+    }
+
+    public boolean isCourseAccessible(Course course, String currentUser) {
+        if (course == null) return false;
+        if (course.getId() != null && INITIAL_COURSE_IDS.contains(course.getId())) {
+            return true;
+        }
+        String creator = course.getCreator();
+        if (creator != null && "SYSTEM".equalsIgnoreCase(creator)) {
+            return true;
+        }
+        if (currentUser == null || currentUser.trim().isEmpty() || "anonymous".equalsIgnoreCase(currentUser.trim())) {
+            return false;
+        }
+        if (creator == null || creator.trim().isEmpty() || "anonymous".equalsIgnoreCase(creator)) {
+            return false;
+        }
+        String userClean = currentUser.trim().toLowerCase();
+        String creatorClean = creator.trim().toLowerCase();
+        if ("operator@text-to-learn.ai".equals(userClean)) {
+            return true;
+        }
+        return creatorClean.equals(userClean) || userClean.contains(creatorClean) || creatorClean.contains(userClean);
     }
 
     public List<Course> getUserCourses(String creator) {

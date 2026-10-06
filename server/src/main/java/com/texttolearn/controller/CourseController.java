@@ -35,14 +35,33 @@ public class CourseController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Course> getCourseById(@PathVariable String id) {
-        return courseService.getCourseById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<?> getCourseById(
+            @PathVariable String id,
+            @RequestParam(required = false) String user) {
+        java.util.Optional<Course> courseOpt = courseService.getCourseById(id);
+        if (courseOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        Course course = courseOpt.get();
+        if (!courseService.isCourseAccessible(course, user)) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.FORBIDDEN)
+                    .body(java.util.Map.of(
+                            "error", "Access denied. You must be signed in as the course creator to view this course.",
+                            "isPrivate", true
+                    ));
+        }
+        return ResponseEntity.ok(course);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteCourse(@PathVariable String id) {
+    public ResponseEntity<?> deleteCourse(
+            @PathVariable String id,
+            @RequestParam(required = false) String user) {
+        java.util.Optional<Course> courseOpt = courseService.getCourseById(id);
+        if (courseOpt.isPresent() && !courseService.isCourseAccessible(courseOpt.get(), user)) {
+            return ResponseEntity.status(org.springframework.http.HttpStatus.FORBIDDEN)
+                    .body(java.util.Map.of("error", "You do not have permission to delete this course."));
+        }
         courseService.deleteCourse(id);
         return ResponseEntity.ok().build();
     }

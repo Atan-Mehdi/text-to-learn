@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getCourse, getLesson, getHinglishTranslation } from '../utils/api';
+import { useAuth } from '../context/AuthContext';
 import Sidebar from '../components/Sidebar';
 import LessonRenderer from '../components/LessonRenderer';
 import LessonPDFExporter from '../components/LessonPDFExporter';
@@ -18,6 +19,8 @@ import {
   Loader2,
   Layers,
   Menu,
+  Lock,
+  LogIn,
 } from 'lucide-react';
 
 function useAudioController() {
@@ -297,11 +300,13 @@ function getEnglishText(lesson) {
 export default function LessonViewerPage() {
   const { courseId, moduleId, lessonId } = useParams();
   const navigate = useNavigate();
+  const { user, openAuthModal } = useAuth();
   const lessonRef = useRef(null);
 
   const [course, setCourse] = useState(null);
   const [lesson, setLesson] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isForbidden, setIsForbidden] = useState(false);
   const [hinglishText, setHinglishText] = useState('');
   const [loadingHinglish, setLoadingHinglish] = useState(false);
   const [showHinglish, setShowHinglish] = useState(false);
@@ -428,15 +433,22 @@ export default function LessonViewerPage() {
   useEffect(() => {
     audioStop();
     setLoading(true);
+    setIsForbidden(false);
     setShowHinglish(false);
     setHinglishText('');
     cachedChunks.current = { en: null, hi: null };
     setSelectedLang('en');
 
-    Promise.all([getCourse(courseId), getLesson(courseId, moduleId, lessonId)])
+    const userIdentifier = user?.email || user?.name || null;
+
+    Promise.all([
+      getCourse(courseId, userIdentifier),
+      getLesson(courseId, moduleId, lessonId, userIdentifier),
+    ])
       .then(([c, l]) => {
         setCourse(c);
         setLesson(l);
+        setIsForbidden(false);
         if (l) {
           cachedChunks.current.en = splitIntoSentences(getEnglishText(l));
           if (l.hinglishExplanation) {
@@ -445,11 +457,52 @@ export default function LessonViewerPage() {
           }
         }
       })
-      .catch(console.error)
+      .catch((err) => {
+        console.error(err);
+        if (err.response?.status === 403 || err.response?.data?.isPrivate) {
+          setIsForbidden(true);
+        }
+      })
       .finally(() => setLoading(false));
 
     return () => audioStop();
-  }, [courseId, moduleId, lessonId, audioStop]);
+  }, [courseId, moduleId, lessonId, user, audioStop]);
+
+  if (isForbidden) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] px-6 py-20 text-center">
+        <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mb-6 shadow-sm">
+          <Lock className="w-8 h-8 text-amber-400" />
+        </div>
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[10px] font-mono uppercase tracking-widest mb-3">
+          // Private Lesson Material
+        </div>
+        <h2 className="text-2xl sm:text-3xl font-extrabold text-[var(--text-primary)] max-w-md tracking-tight">
+          Restricted Access
+        </h2>
+        <p className="text-xs sm:text-sm text-[var(--text-muted)] mt-2.5 max-w-md leading-relaxed">
+          This lesson belongs to a privately generated course and is only accessible to its creator. Please log in with the creator account to access this lesson.
+        </p>
+
+        <div className="flex flex-wrap items-center justify-center gap-3 mt-8">
+          <button
+            onClick={() => openAuthModal('login')}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-mono uppercase tracking-wider font-bold transition-all shadow-md cursor-pointer hover:scale-[1.02]"
+          >
+            <LogIn className="w-3.5 h-3.5" />
+            <span>Sign In to Access</span>
+          </button>
+          <Link
+            to="/"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[var(--bg-panel)] hover:bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text-primary)] text-xs font-mono uppercase tracking-wider font-medium transition-all"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>Return to Catalog</span>
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   const allLessons = [];
   course?.modules?.forEach((m) => {

@@ -18,10 +18,21 @@ public class LessonController {
     }
 
     @GetMapping("/{courseId}/{moduleId}/{lessonId}")
-    public ResponseEntity<Lesson> getLesson(
+    public ResponseEntity<?> getLesson(
             @PathVariable String courseId,
             @PathVariable String moduleId,
-            @PathVariable String lessonId) {
+            @PathVariable String lessonId,
+            @RequestParam(required = false) String user) {
+        java.util.Optional<com.texttolearn.model.Course> courseOpt = courseService.getCourseById(courseId);
+        if (courseOpt.isPresent()) {
+            if (!courseService.isCourseAccessible(courseOpt.get(), user)) {
+                return ResponseEntity.status(org.springframework.http.HttpStatus.FORBIDDEN)
+                        .body(java.util.Map.of(
+                                "error", "Access denied. You must be signed in as the course creator to view this lesson.",
+                                "isPrivate", true
+                        ));
+            }
+        }
         Lesson lesson = courseService.getOrGenerateLesson(courseId, moduleId, lessonId);
         return ResponseEntity.ok(lesson);
     }

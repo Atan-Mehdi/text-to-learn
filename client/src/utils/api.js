@@ -42,8 +42,10 @@ export const generateCourse = async (topic, creator) => {
   return res.data;
 };
 
-export const getCourse = async (courseId) => {
-  const res = await api.get(`/api/courses/${courseId}`);
+export const getCourse = async (courseId, user) => {
+  const res = await api.get(`/api/courses/${courseId}`, {
+    params: user ? { user } : {},
+  });
   return res.data;
 };
 
@@ -54,13 +56,17 @@ export const getAllCourses = async (user) => {
   return res.data;
 };
 
-export const deleteCourseApi = async (courseId) => {
-  const res = await api.delete(`/api/courses/${courseId}`);
+export const deleteCourseApi = async (courseId, user) => {
+  const res = await api.delete(`/api/courses/${courseId}`, {
+    params: user ? { user } : {},
+  });
   return res.data;
 };
 
-export const getLesson = async (courseId, moduleId, lessonId) => {
-  const res = await api.get(`/api/lessons/${courseId}/${moduleId}/${lessonId}`);
+export const getLesson = async (courseId, moduleId, lessonId, user) => {
+  const res = await api.get(`/api/lessons/${courseId}/${moduleId}/${lessonId}`, {
+    params: user ? { user } : {},
+  });
   return res.data;
 };
 
