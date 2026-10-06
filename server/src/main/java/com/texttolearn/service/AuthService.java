@@ -5,14 +5,20 @@ import com.texttolearn.dto.LoginRequest;
 import com.texttolearn.dto.RegisterRequest;
 import com.texttolearn.model.User;
 import com.texttolearn.repository.UserRepository;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.Base64;
+import java.util.Date;
 import java.util.Optional;
 
 @Service
@@ -20,8 +26,19 @@ public class AuthService {
 
     private final UserRepository userRepository;
 
+    @Value("${jwt.secret:TextToLearnSuperSecretSecureSigningKeyForJwtAuthentication2026!}")
+    private String jwtSecret;
+
+    @Value("${jwt.expiration.ms:604800000}") // 7 days default
+    private long jwtExpirationMs;
+
     public AuthService(UserRepository userRepository) {
         this.userRepository = userRepository;
+    }
+
+    private SecretKey getSigningKey() {
+        byte[] keyBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 
     @PostConstruct
@@ -111,7 +128,6 @@ public class AuthService {
             user.setAuth0Sub(req.getSub());
             user = userRepository.save(user);
         } else {
-
             if (req.getName() != null && !req.getName().trim().isEmpty()) {
                 user.setName(req.getName().trim());
             }
@@ -136,22 +152,43 @@ public class AuthService {
 
         String cleanToken = token.startsWith("Bearer ") ? token.substring(7).trim() : token.trim();
         try {
-            byte[] decoded = Base64.getDecoder().decode(cleanToken);
-            String payload = new String(decoded, StandardCharsets.UTF_8);
-            String[] parts = payload.split(":");
-            if (parts.length >= 2) {
-                String email = parts[0];
-                return userRepository.findByEmail(email);
+            Claims claims = Jwts.parser()
+                    .verifyWith(getSigningKey())
+                    .build()
+                    .parseSignedClaims(cleanToken)
+                    .getPayload();
+
+            String email = claims.getSubject();
+            if (email != null && !email.trim().isEmpty()) {
+                return userRepository.findByEmail(email.trim().toLowerCase());
             }
         } catch (Exception e) {
-
+            try {
+                byte[] decoded = Base64.getDecoder().decode(cleanToken);
+                String payload = new String(decoded, StandardCharsets.UTF_8);
+                String[] parts = payload.split(":");
+                if (parts.length >= 2) {
+                    String email = parts[0];
+                    return userRepository.findByEmail(email.trim().toLowerCase());
+                }
+            } catch (Exception ignored) {
+            }
         }
         return Optional.empty();
     }
 
     private String generateToken(User user) {
-        String payload = user.getEmail() + ":" + Instant.now().toEpochMilli();
-        return Base64.getEncoder().encodeToString(payload.getBytes(StandardCharsets.UTF_8));
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + jwtExpirationMs);
+
+        return Jwts.builder()
+                .subject(user.getEmail())
+                .claim("name", user.getName())
+                .claim("role", user.getRole())
+                .issuedAt(now)
+                .expiration(expiryDate)
+                .signWith(getSigningKey())
+                .compact();
     }
 
     private String hashPassword(String password) {
