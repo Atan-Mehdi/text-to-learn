@@ -5,9 +5,8 @@ import { getCourse, deleteCourseApi } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 
 const INITIAL_COURSE_IDS = [
-  '8a96fddb-0ad0-4c96-abaa-ef93d2daa8c7',
+  'b5487d1b-886b-403d-9b80-ef58495f0b82',
   'b968ee0d-86eb-4c19-b64c-6a10239690da',
-  '3775f8b3-cc8c-4597-a189-4a63842f2387',
 ];
 
 export default function CoursePage() {

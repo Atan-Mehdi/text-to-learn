@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Video, ExternalLink } from 'lucide-react';
+import { Video, ExternalLink, ShieldAlert, Search } from 'lucide-react';
 import { searchYouTubeVideo } from '../../utils/api';
 
 export default function VideoBlock({ query, url }) {
@@ -54,11 +54,11 @@ export default function VideoBlock({ query, url }) {
         )}
       </div>
 
-      <div className="relative w-full aspect-video rounded-xl border border-[var(--border)] bg-black overflow-hidden shadow-inner">
+      <div className="relative w-full aspect-video rounded-xl border border-[var(--border)] bg-[#07070a] overflow-hidden shadow-inner flex items-center justify-center">
         {loading ? (
           <div className="flex flex-col items-center justify-center h-full text-zinc-400 text-xs gap-3">
             <div className="w-7 h-7 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-            <span className="font-mono uppercase tracking-wider text-[11px]">Locating relevant companion tutorial...</span>
+            <span className="font-mono uppercase tracking-wider text-[11px]">Locating verified companion tutorial...</span>
           </div>
         ) : videoData?.embedUrl ? (
           <iframe
@@ -69,20 +69,33 @@ export default function VideoBlock({ query, url }) {
             allowFullScreen
           />
         ) : (
-          <div className="flex flex-col items-center justify-center h-full text-zinc-400 text-xs gap-3 p-6 text-center">
-            <Video className="w-8 h-8 text-emerald-400 mb-1" />
-            <span className="font-mono uppercase tracking-wider text-zinc-300 text-xs">
-              Search YouTube for "{query || 'Lesson Tutorial'}"
-            </span>
+          <div className="flex flex-col items-center justify-center h-full text-zinc-400 text-xs gap-3 p-6 sm:p-8 text-center bg-gradient-to-b from-zinc-950/80 to-black/90">
+            <div className="w-11 h-11 rounded-2xl bg-amber-500/10 border border-amber-500/25 flex items-center justify-center text-amber-400 shadow-sm">
+              <ShieldAlert className="w-5 h-5" />
+            </div>
+
+            <div className="max-w-md">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 font-mono text-[10px] uppercase tracking-wider mb-2">
+                // Strict Quality Filter
+              </div>
+              <h5 className="font-bold text-sm sm:text-base text-zinc-200 mb-1.5">
+                No Verified Video Companion Selected
+              </h5>
+              <p className="text-xs text-zinc-400 leading-relaxed font-normal">
+                To prevent irrelevant or misleading video suggestions, an automatic video was withheld for this specific lesson. You can search YouTube directly for verified community tutorials.
+              </p>
+            </div>
+
             <a
               href={`https://www.youtube.com/results?search_query=${encodeURIComponent(
                 query || 'tutorial'
               )}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-5 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-black font-mono text-xs font-semibold uppercase tracking-wider transition-all"
+              className="mt-2 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-mono text-xs font-bold uppercase tracking-wider transition-all cursor-pointer shadow-md hover:scale-[1.02]"
             >
-              Search on YouTube
+              <Search className="w-3.5 h-3.5" />
+              <span>Search "{query || 'Topic'}" on YouTube</span>
             </a>
           </div>
         )}

@@ -71,4 +71,10 @@ public class CourseController {
         int deleted = courseService.cleanupOldCourses(keep);
         return ResponseEntity.ok(java.util.Map.of("deleted", deleted, "remaining", keep));
     }
+
+    @PostMapping("/cache/clear")
+    public ResponseEntity<?> clearCache() {
+        courseService.clearCache();
+        return ResponseEntity.ok(java.util.Map.of("message", "In-memory LRU cache cleared successfully."));
+    }
 }

@@ -29,12 +29,92 @@ public class CourseService {
     @Value("${spring.data.mongodb.uri:}")
     private String mongoUri;
 
-    private final Map<String, Course> memoryCourseStore = new ConcurrentHashMap<>();
-    private final Map<String, Lesson> memoryLessonStore = new ConcurrentHashMap<>();
+    private static final int MAX_CACHE_COURSES = 30;
+    private static final int MAX_CACHE_LESSONS = 100;
+
+    private static class LRUCache<K, V> extends LinkedHashMap<K, V> {
+        private final int maxCapacity;
+
+        public LRUCache(int maxCapacity) {
+            super(maxCapacity + 1, 0.75f, true);
+            this.maxCapacity = maxCapacity;
+        }
+
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
+            return size() > maxCapacity;
+        }
+    }
+
+    private final Map<String, Course> memoryCourseStore = Collections.synchronizedMap(new LRUCache<>(MAX_CACHE_COURSES));
+    private final Map<String, Lesson> memoryLessonStore = Collections.synchronizedMap(new LRUCache<>(MAX_CACHE_LESSONS));
 
     public CourseService(GeminiService geminiService, @Autowired(required = false) YouTubeService youTubeService) {
         this.geminiService = geminiService;
         this.youTubeService = youTubeService;
+    }
+
+    @jakarta.annotation.PostConstruct
+    public void normalizeExistingCoursesAndLessons() {
+        if (courseRepository != null && mongoUri != null && !mongoUri.trim().isEmpty() && lessonRepository != null) {
+            try {
+                List<Course> courses = courseRepository.findAll();
+                for (Course course : courses) {
+                    String detectedLang = detectCourseLanguage(course.getTitle());
+                    if (course.getModules() != null) {
+                        for (Module m : course.getModules()) {
+                            if (m.getLessons() != null) {
+                                for (Lesson l : m.getLessons()) {
+                                    if (l.isEnriched() && l.getContent() != null) {
+                                        boolean modified = false;
+                                        for (ContentBlock block : l.getContent()) {
+                                            if ("code".equals(block.getType())) {
+                                                if (block.getLanguage() == null || ("cpp".equalsIgnoreCase(block.getLanguage()) && !"cpp".equals(detectedLang))) {
+                                                    block.setLanguage(detectedLang);
+                                                    modified = true;
+                                                }
+                                            }
+                                        }
+                                        if (modified) {
+                                            lessonRepository.save(l);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                System.err.println("Could not auto-migrate existing lessons: " + e.getMessage());
+            }
+        }
+    }
+
+    private String detectCourseLanguage(String text) {
+        if (text == null) return "javascript";
+        String lower = text.toLowerCase();
+        if (lower.contains("python") || lower.contains("py")) return "python";
+        if (lower.contains("typescript") || lower.contains(" ts ")) return "typescript";
+        if (lower.contains("javascript") || lower.contains(" js ") || lower.contains("react") || lower.contains("node")) return "javascript";
+        if (lower.contains("java") && !lower.contains("javascript")) return "java";
+        if (lower.contains("c++") || lower.contains("cpp")) return "cpp";
+        if (lower.contains("c#") || lower.contains("csharp")) return "csharp";
+        if (lower.contains("golang") || lower.contains(" go ")) return "go";
+        if (lower.contains("rust")) return "rust";
+        if (lower.contains("sql") || lower.contains("postgres") || lower.contains("mysql")) return "sql";
+        return "javascript";
+    }
+
+    private void normalizeLessonCodeLanguage(String courseTitle, Lesson lesson) {
+        if (lesson == null || lesson.getContent() == null) return;
+        String lang = detectCourseLanguage(courseTitle + " " + lesson.getTitle());
+        for (ContentBlock block : lesson.getContent()) {
+            if ("code".equals(block.getType())) {
+                if (block.getLanguage() == null || ("cpp".equalsIgnoreCase(block.getLanguage()) && !"cpp".equals(lang))) {
+                    block.setLanguage(lang);
+                }
+            }
+        }
     }
 
     public Course generateAndSaveCourse(String topic, String creator) {
@@ -45,8 +125,6 @@ public class CourseService {
         course.setCreatedAt(Instant.now());
         course.setUpdatedAt(Instant.now());
 
-        memoryCourseStore.put(course.getId(), course);
-
         if (course.getModules() != null) {
             for (Module m : course.getModules()) {
                 if (m.getId() == null) m.setId(UUID.randomUUID().toString());
@@ -55,37 +133,43 @@ public class CourseService {
                         if (l.getId() == null) l.setId(UUID.randomUUID().toString());
                         l.setCourseId(course.getId());
                         l.setModuleId(m.getId());
-                        memoryLessonStore.put(l.getId(), l);
                     }
                 }
             }
         }
 
         if (courseRepository != null && mongoUri != null && !mongoUri.trim().isEmpty()) {
-            try {
-                Course saved = courseRepository.save(course);
-                if (saved.getModules() != null && lessonRepository != null) {
-                    for (Module m : saved.getModules()) {
-                        if (m.getLessons() != null) {
-                            for (Lesson l : m.getLessons()) {
-                                lessonRepository.save(l);
-                            }
+            Course saved = courseRepository.save(course);
+            if (saved.getModules() != null && lessonRepository != null) {
+                for (Module m : saved.getModules()) {
+                    if (m.getLessons() != null) {
+                        for (Lesson l : m.getLessons()) {
+                            lessonRepository.save(l);
+                            memoryLessonStore.put(l.getId(), l);
                         }
                     }
                 }
-                return saved;
-            } catch (Exception e) {
-                System.err.println("MongoDB unavailable, using in-memory store: " + e.getMessage());
             }
+            memoryCourseStore.put(saved.getId(), saved);
+            return saved;
         }
 
+        memoryCourseStore.put(course.getId(), course);
+        if (course.getModules() != null) {
+            for (Module m : course.getModules()) {
+                if (m.getLessons() != null) {
+                    for (Lesson l : m.getLessons()) {
+                        memoryLessonStore.put(l.getId(), l);
+                    }
+                }
+            }
+        }
         return course;
     }
 
     private static final Set<String> INITIAL_COURSE_IDS = Set.of(
-        "8a96fddb-0ad0-4c96-abaa-ef93d2daa8c7",
-        "b968ee0d-86eb-4c19-b64c-6a10239690da",
-        "3775f8b3-cc8c-4597-a189-4a63842f2387"
+        "b5487d1b-886b-403d-9b80-ef58495f0b82",
+        "b968ee0d-86eb-4c19-b64c-6a10239690da"
     );
 
     public List<Course> getAllCourses(String currentUser) {
@@ -138,16 +222,25 @@ public class CourseService {
     }
 
     public Optional<Course> getCourseById(String id) {
+        Course cached = memoryCourseStore.get(id);
+        if (cached != null) {
+            return Optional.of(cached);
+        }
         if (courseRepository != null && mongoUri != null && !mongoUri.trim().isEmpty()) {
             try {
                 Optional<Course> opt = courseRepository.findById(id);
-                if (opt.isPresent()) return opt;
+                if (opt.isPresent()) {
+                    memoryCourseStore.put(id, opt.get());
+                    return opt;
+                }
             } catch (Exception ignored) {}
         }
-        return Optional.ofNullable(memoryCourseStore.get(id));
+        return Optional.empty();
     }
 
     public boolean isCourseAccessible(Course course, String currentUser) {
+        // System.out.println("Current User:: " + currentUser);
+        // System.out.println("Creator User:: " + course.getCreator());
         if (course == null) return false;
         if (course.getId() != null && INITIAL_COURSE_IDS.contains(course.getId())) {
             return true;
@@ -164,7 +257,7 @@ public class CourseService {
         }
         String userClean = currentUser.trim().toLowerCase();
         String creatorClean = creator.trim().toLowerCase();
-        if ("operator@text-to-learn.ai".equals(userClean)) {
+        if (creatorClean.equals(userClean)) {
             return true;
         }
         return creatorClean.equals(userClean) || userClean.contains(creatorClean) || creatorClean.contains(userClean);
@@ -205,7 +298,20 @@ public class CourseService {
         }
 
         if (cached != null && cached.isEnriched()) {
+            normalizeLessonCodeLanguage(courseTitle, cached);
             return cached;
+        }
+
+        if (lessonRepository != null && mongoUri != null && !mongoUri.trim().isEmpty()) {
+            try {
+                Optional<Lesson> dbOpt = lessonRepository.findById(lessonId);
+                if (dbOpt.isPresent() && dbOpt.get().isEnriched()) {
+                    Lesson dbLesson = dbOpt.get();
+                    normalizeLessonCodeLanguage(courseTitle, dbLesson);
+                    memoryLessonStore.put(lessonId, dbLesson);
+                    return dbLesson;
+                }
+            } catch (Exception ignored) {}
         }
 
         String lessonTitle = (cached != null && cached.getTitle() != null) ? cached.getTitle() : "Lesson Details";
@@ -266,21 +372,22 @@ public class CourseService {
                         block.setVideoThumbnail(bestVideo.get("thumbnail"));
                         block.setUrl(bestVideo.get("embedUrl"));
                     } else {
-
-                        it.remove();
+                        block.setUrl(null);
+                        block.setVideoId(null);
                     }
                 }
             }
         }
 
-        memoryLessonStore.put(lessonId, enriched);
-
         if (lessonRepository != null && mongoUri != null && !mongoUri.trim().isEmpty()) {
             try {
-                lessonRepository.save(enriched);
-            } catch (Exception ignored) {}
+                enriched = lessonRepository.save(enriched);
+            } catch (Exception e) {
+                System.err.println("Error saving lesson to MongoDB: " + e.getMessage());
+            }
         }
 
+        memoryLessonStore.put(lessonId, enriched);
         return enriched;
     }
 
@@ -334,5 +441,10 @@ public class CourseService {
             deletedCount++;
         }
         return deletedCount;
+    }
+
+    public void clearCache() {
+        memoryCourseStore.clear();
+        memoryLessonStore.clear();
     }
 }

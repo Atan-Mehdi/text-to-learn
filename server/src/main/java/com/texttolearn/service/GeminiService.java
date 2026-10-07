@@ -290,12 +290,12 @@ public class GeminiService {
             "CONTENT RULES:\n" +
             "1. Provide exactly 3 clear learning objectives specific to '%s'.\n" +
             "2. Explain the concept progressively and keep the explanation appropriate for the learner level.\n" +
-            "3. Programming examples must directly demonstrate the current lesson with clean, runnable code.\n" +
-            "4. Keep code focused and choose the natural programming language for the topic.\n" +
+            "3. Programming examples must directly demonstrate the current lesson with clean, runnable code in the EXACT programming language matching the course/topic (e.g., JavaScript for JS courses, Python for Python, Java for Java, C++ for C++, etc.).\n" +
+            "4. For code blocks, set \"language\" strictly to the identifier of the topic's programming language (e.g. 'javascript', 'python', 'java', 'cpp', 'csharp', 'go', 'rust', 'sql', 'html', 'css').\n" +
             "5. VIDEO RECOMMENDATION RULES (CRITICAL):\n" +
             "   - Do NEVER invent, hallucinate, or return a YouTube video ID, watch URL, or embed URL.\n" +
-            "   - Provide ONLY a concise, highly specific YouTube search query combining the programming language, topic, and exact concept (e.g. 'C++ declare array syntax beginner tutorial').\n" +
-            "   - Provide 3-5 'requiredKeywords' that the video MUST cover (e.g. [\"C++\", \"array\", \"declaration\", \"syntax\"]).\n" +
+            "   - Provide ONLY a concise, highly specific YouTube search query combining the programming language/topic and exact concept (e.g. 'JavaScript arrays beginner tutorial' or 'Python loops tutorial').\n" +
+            "   - Provide 3-5 'requiredKeywords' that the video MUST cover (e.g. [\"JavaScript\", \"Array\", \"Methods\"]).\n" +
             "6. Create 3-4 Multiple Choice Questions (MCQs) testing concepts taught in THIS lesson. Each question must have 4 options, a 0-indexed correct answer, and an explanation.\n\n" +
             "Return ONLY valid JSON. No markdown. No code fences. No text outside JSON.\n\n" +
             "{\n" +
@@ -309,7 +309,7 @@ public class GeminiService {
             "    {\"type\": \"paragraph\", \"text\": \"Clear, step-by-step conceptual explanation tailored to the learner level...\"},\n" +
             "    {\"type\": \"heading\", \"text\": \"How It Works & Practical Demonstration\"},\n" +
             "    {\"type\": \"paragraph\", \"text\": \"Detailed breakdown of syntax, behavior, and mental model...\"},\n" +
-            "    {\"type\": \"code\", \"language\": \"cpp\", \"text\": \"// Runnable, focused code directly demonstrating the lesson\"},\n" +
+            "    {\"type\": \"code\", \"language\": \"<language_of_topic_e.g_javascript_or_python_or_java_or_cpp>\", \"text\": \"// Runnable, focused code in the course programming language demonstrating the lesson\"},\n" +
             "    {\"type\": \"paragraph\", \"text\": \"Explanation of the code and expected behavior...\"},\n" +
             "    {\"type\": \"heading\", \"text\": \"Common Mistakes & Best Practices\"},\n" +
             "    {\"type\": \"paragraph\", \"text\": \"Common mistakes learners should avoid and tips for clean usage...\"},\n" +
@@ -660,13 +660,9 @@ public class GeminiService {
             ". Once the basic concept is clear, it becomes easier to apply it to practical problems."
         ).build());
 
-        blocks.add(ContentBlock.builder().type("code").language("cpp").text(
-            "// Simple example demonstrating " + lessonTitle + "\n" +
-            "int main() {\n" +
-            "    // Implementation\n" +
-            "    return 0;\n" +
-            "}"
-        ).build());
+        String lang = detectLanguage(courseTitle + " " + lessonTitle);
+        String sampleCode = generateSampleCodeForLang(lang, lessonTitle);
+        blocks.add(ContentBlock.builder().type("code").language(lang).text(sampleCode).build());
 
         blocks.add(ContentBlock.builder().type("heading").text("Common Mistakes").build());
         blocks.add(ContentBlock.builder().type("paragraph").text(
@@ -692,5 +688,36 @@ public class GeminiService {
         lesson.setContent(blocks);
         lesson.setEnriched(true);
         return lesson;
+    }
+
+    private String detectLanguage(String text) {
+        if (text == null) return "javascript";
+        String lower = text.toLowerCase();
+        if (lower.contains("python") || lower.contains("py")) return "python";
+        if (lower.contains("typescript") || lower.contains(" ts ") || lower.contains(".ts")) return "typescript";
+        if (lower.contains("javascript") || lower.contains(" js ") || lower.contains("node") || lower.contains("react")) return "javascript";
+        if (lower.contains("java") && !lower.contains("javascript")) return "java";
+        if (lower.contains("c++") || lower.contains("cpp")) return "cpp";
+        if (lower.contains("c#") || lower.contains("csharp") || lower.contains(".net")) return "csharp";
+        if (lower.contains("golang") || lower.contains(" go ")) return "go";
+        if (lower.contains("rust")) return "rust";
+        if (lower.contains("sql") || lower.contains("postgres") || lower.contains("mysql")) return "sql";
+        if (lower.contains("html") || lower.contains("web")) return "html";
+        if (lower.contains("css") || lower.contains("style")) return "css";
+        return "javascript";
+    }
+
+    private String generateSampleCodeForLang(String lang, String lessonTitle) {
+        return switch (lang.toLowerCase()) {
+            case "python" -> "# Simple demonstration of " + lessonTitle + "\ndef main():\n    print(\"Hello from " + lessonTitle + "!\")\n\nif __name__ == \"__main__\":\n    main()";
+            case "java" -> "// Simple demonstration of " + lessonTitle + "\npublic class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello from " + lessonTitle + "!\");\n    }\n}";
+            case "cpp" -> "// Simple demonstration of " + lessonTitle + "\n#include <iostream>\n\nint main() {\n    std::cout << \"Hello from " + lessonTitle + "!\" << std::endl;\n    return 0;\n}";
+            case "typescript" -> "// Simple demonstration of " + lessonTitle + "\nfunction runDemo(topic: string): void {\n    console.log(`Hello from ${topic}!`);\n}\n\nrunDemo(\"" + lessonTitle + "\");";
+            case "csharp" -> "// Simple demonstration of " + lessonTitle + "\nusing System;\n\nclass Program {\n    static void Main() {\n        Console.WriteLine(\"Hello from " + lessonTitle + "!\");\n    }\n}";
+            case "go" -> "// Simple demonstration of " + lessonTitle + "\npackage main\n\nimport \"fmt\"\n\nfunc main() {\n    fmt.Println(\"Hello from " + lessonTitle + "!\")\n}";
+            case "rust" -> "// Simple demonstration of " + lessonTitle + "\nfn main() {\n    println!(\"Hello from " + lessonTitle + "!\");\n}";
+            case "sql" -> "-- Demonstration query for " + lessonTitle + "\nSELECT * FROM learning_topics WHERE topic_name = '" + lessonTitle.replace("'", "''") + "';";
+            default -> "// Simple demonstration of " + lessonTitle + "\nfunction main() {\n    console.log(\"Hello from " + lessonTitle + "!\");\n}\n\nmain();";
+        };
     }
 }

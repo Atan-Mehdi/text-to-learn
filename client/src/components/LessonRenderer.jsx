@@ -60,29 +60,45 @@ export default function LessonRenderer({ lesson }) {
         {content && content.length > 0 ? (
           (() => {
             let mcqCounter = 0;
-            return content.map((block, idx) => {
+            const hasVideo = content.some((b) => b.type === 'video');
+            const elements = [];
+            let videoRendered = false;
+
+            content.forEach((block, idx) => {
+              if (!hasVideo && !videoRendered && (block.type === 'mcq' || block.type === 'question' || block.type === 'quiz')) {
+                videoRendered = true;
+                elements.push(
+                  <VideoBlock key="fallback-video-block" query={`${title} tutorial`} />
+                );
+              }
+
               switch (block.type) {
                 case 'heading':
-                  return <HeadingBlock key={idx} text={block.text} />;
+                  elements.push(<HeadingBlock key={idx} text={block.text} />);
+                  break;
                 case 'paragraph':
-                  return <ParagraphBlock key={idx} text={block.text} />;
+                  elements.push(<ParagraphBlock key={idx} text={block.text} />);
+                  break;
                 case 'code':
-                  return (
+                  elements.push(
                     <CodeBlock
                       key={idx}
                       language={block.language}
                       text={block.text}
                     />
                   );
+                  break;
                 case 'video':
-                  return (
+                  videoRendered = true;
+                  elements.push(
                     <VideoBlock key={idx} query={block.query} url={block.url} />
                   );
+                  break;
                 case 'mcq':
                 case 'question':
                 case 'quiz': {
                   mcqCounter++;
-                  return (
+                  elements.push(
                     <MCQBlock
                       key={idx}
                       questionNumber={mcqCounter}
@@ -92,11 +108,20 @@ export default function LessonRenderer({ lesson }) {
                       explanation={block.explanation}
                     />
                   );
+                  break;
                 }
                 default:
-                  return <ParagraphBlock key={idx} text={block.text || ''} />;
+                  elements.push(<ParagraphBlock key={idx} text={block.text || ''} />);
               }
             });
+
+            if (!hasVideo && !videoRendered && title) {
+              elements.push(
+                <VideoBlock key="fallback-video-block" query={`${title} tutorial`} />
+              );
+            }
+
+            return elements;
           })()
         ) : (
           <p className="font-sans text-[var(--ink-muted)] italic text-sm">
