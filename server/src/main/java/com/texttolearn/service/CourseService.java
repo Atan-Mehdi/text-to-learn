@@ -239,8 +239,6 @@ public class CourseService {
     }
 
     public boolean isCourseAccessible(Course course, String currentUser) {
-        // System.out.println("Current User:: " + currentUser);
-        // System.out.println("Creator User:: " + course.getCreator());
         if (course == null) return false;
         if (course.getId() != null && INITIAL_COURSE_IDS.contains(course.getId())) {
             return true;
