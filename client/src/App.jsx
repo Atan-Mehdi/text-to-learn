@@ -5,6 +5,7 @@ import { Auth0ProviderWrapper } from './context/Auth0ProviderWrapper';
 import { AuthProvider } from './context/AuthContext';
 import Topbar from './components/Topbar';
 import AuthModal from './components/AuthModal';
+import ScrollToTop from './components/ScrollToTop';
 import HomePage from './pages/HomePage';
 import CoursePage from './pages/CoursePage';
 import LessonViewerPage from './pages/LessonViewerPage';
@@ -14,7 +15,8 @@ export default function App() {
     <ThemeProvider>
       <Auth0ProviderWrapper>
         <AuthProvider>
-          <div className="min-h-screen bg-[var(--bg-page)] text-[var(--text-primary)] flex flex-col font-sans selection:bg-emerald-500 selection:text-black transition-colors duration-200">
+          <ScrollToTop />
+          <div className="min-h-screen bg-[var(--bg-page)] text-[var(--text-primary)] flex flex-col font-sans selection:bg-emerald-500 selection:text-black">
             <Topbar />
             <div className="flex-1 flex flex-col">
               <Routes>

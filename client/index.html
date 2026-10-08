@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark" style="background-color: #08080a; color-scheme: dark;">
 
 <head>
   <meta charset="UTF-8" />
@@ -9,9 +9,27 @@
   <meta name="description"
     content="Generate custom interactive courses on any topic with structured lessons, bilingual voice narration, quizzes, and PDF export." />
 
+  <script>
+    (function () {
+      try {
+        var theme = localStorage.getItem('text-to-learn-theme');
+        if (theme === 'light') {
+          document.documentElement.classList.remove('dark');
+          document.documentElement.classList.add('light');
+          document.documentElement.style.backgroundColor = '#f8f9fa';
+          document.documentElement.style.colorScheme = 'light';
+        } else {
+          document.documentElement.classList.add('dark');
+          document.documentElement.classList.remove('light');
+          document.documentElement.style.backgroundColor = '#08080a';
+          document.documentElement.style.colorScheme = 'dark';
+        }
+      } catch (e) { }
+    })();
+  </script>
 </head>
 
-<body>
+<body style="background-color: inherit; margin: 0; padding: 0;">
   <div id="root"></div>
   <script type="module" src="/src/main.jsx"></script>
 </body>

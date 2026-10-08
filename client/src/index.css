@@ -4,14 +4,13 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @layer base {
-  :root {
+  :root, html.dark {
     --font-display: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
     --font-body: 'Inter', system-ui, -apple-system, sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
-  }
 
-  html.dark {
     --bg-page: #08080a;
+    --bg-canvas: #08080a;
     --bg-card: #111115;
     --bg-card-hover: #17171c;
     --bg-panel: #141418;
@@ -20,13 +19,17 @@
     --text-primary: #f4f4f7;
     --text-muted: #8b8b99;
     --text-dim: #545460;
+    --ink: #f4f4f7;
+    --ink-muted: #8b8b99;
+    --ink-dim: #545460;
     --accent: #10b981;
     --accent-glow: rgba(16, 185, 129, 0.12);
     --accent-hover: #059669;
   }
 
-  html.light, html:not(.dark) {
+  html.light {
     --bg-page: #f8f9fa;
+    --bg-canvas: #f8f9fa;
     --bg-card: #ffffff;
     --bg-card-hover: #f1f3f5;
     --bg-panel: #f3f4f6;
@@ -35,6 +38,9 @@
     --text-primary: #09090b;
     --text-muted: #52525b;
     --text-dim: #a1a1aa;
+    --ink: #09090b;
+    --ink-muted: #52525b;
+    --ink-dim: #a1a1aa;
     --accent: #09090b;
     --accent-glow: rgba(0, 0, 0, 0.04);
     --accent-hover: #27272a;
@@ -47,7 +53,6 @@
     margin: 0;
     padding: 0;
     min-height: 100vh;
-    transition: background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   h1, h2, h3, h4, h5, h6 {

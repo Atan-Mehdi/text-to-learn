@@ -18,9 +18,13 @@ export function ThemeProvider({ children }) {
     if (theme === 'dark') {
       root.classList.add('dark');
       root.classList.remove('light');
+      root.style.backgroundColor = '#08080a';
+      root.style.colorScheme = 'dark';
     } else {
       root.classList.add('light');
       root.classList.remove('dark');
+      root.style.backgroundColor = '#f8f9fa';
+      root.style.colorScheme = 'light';
     }
     try {
       localStorage.setItem('text-to-learn-theme', theme);

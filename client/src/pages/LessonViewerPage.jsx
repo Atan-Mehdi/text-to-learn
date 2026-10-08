@@ -431,6 +431,10 @@ export default function LessonViewerPage() {
   };
 
   useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    const mainEl = document.querySelector('main');
+    if (mainEl) mainEl.scrollTop = 0;
+
     audioStop();
     setLoading(true);
     setIsForbidden(false);
@@ -694,55 +698,57 @@ export default function LessonViewerPage() {
         ) : (
           <div
             ref={lessonRef}
-            className="p-5 sm:p-8 md:p-12 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] transition-colors"
+            className="p-5 sm:p-8 md:p-12 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)]"
           >
             <LessonRenderer lesson={lesson} />
           </div>
         )}
 
-        <div className="mt-10 sm:mt-12 pt-6 border-t border-[var(--border)] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
-          {prevLesson ? (
-            <button
-              onClick={() =>
-                navigate(
-                  `/courses/${courseId}/module/${prevLesson.moduleId}/lesson/${prevLesson.id}`
-                )
-              }
-              className="flex items-center justify-center sm:justify-start gap-2 px-4 py-2.5 rounded-xl bg-[var(--bg-card)] hover:bg-[var(--bg-card-hover)] text-[var(--ink)] border border-[var(--border)] font-mono text-xs font-semibold transition-all cursor-pointer hover:border-emerald-500/40"
-            >
-              <ArrowLeft className="w-3.5 h-3.5 flex-shrink-0" />
-              <span className="truncate max-w-[200px] sm:max-w-[220px]">
-                {prevLesson.title}
-              </span>
-            </button>
-          ) : (
-            <div className="hidden sm:block" />
-          )}
+        {!loading && lesson && (
+          <div className="mt-10 sm:mt-12 pt-6 border-t border-[var(--border)] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
+            {prevLesson ? (
+              <button
+                onClick={() =>
+                  navigate(
+                    `/courses/${courseId}/module/${prevLesson.moduleId}/lesson/${prevLesson.id}`
+                  )
+                }
+                className="flex items-center justify-center sm:justify-start gap-2 px-4 py-2.5 rounded-xl bg-[var(--bg-card)] hover:bg-[var(--bg-card-hover)] text-[var(--ink)] border border-[var(--border)] font-mono text-xs font-semibold transition-all cursor-pointer hover:border-emerald-500/40"
+              >
+                <ArrowLeft className="w-3.5 h-3.5 flex-shrink-0" />
+                <span className="truncate max-w-[200px] sm:max-w-[220px]">
+                  {prevLesson.title}
+                </span>
+              </button>
+            ) : (
+              <div className="hidden sm:block" />
+            )}
 
-          {nextLesson ? (
-            <button
-              onClick={() =>
-                navigate(
-                  `/courses/${courseId}/module/${nextLesson.moduleId}/lesson/${nextLesson.id}`
-                )
-              }
-              className="flex items-center justify-center sm:justify-end gap-2 px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-mono text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer shadow-sm"
-            >
-              <span className="truncate max-w-[200px] sm:max-w-[220px]">
-                {nextLesson.title}
-              </span>
-              <ArrowRight className="w-3.5 h-3.5 flex-shrink-0" />
-            </button>
-          ) : (
-            <Link
-              to={`/courses/${courseId}`}
-              className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-mono text-xs font-semibold uppercase tracking-wider transition-all shadow-sm"
-            >
-              <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-              <span>Complete Course</span>
-            </Link>
-          )}
-        </div>
+            {nextLesson ? (
+              <button
+                onClick={() =>
+                  navigate(
+                    `/courses/${courseId}/module/${nextLesson.moduleId}/lesson/${nextLesson.id}`
+                  )
+                }
+                className="flex items-center justify-center sm:justify-end gap-2 px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-mono text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer shadow-sm"
+              >
+                <span className="truncate max-w-[200px] sm:max-w-[220px]">
+                  {nextLesson.title}
+                </span>
+                <ArrowRight className="w-3.5 h-3.5 flex-shrink-0" />
+              </button>
+            ) : (
+              <Link
+                to={`/courses/${courseId}`}
+                className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black font-mono text-xs font-semibold uppercase tracking-wider transition-all shadow-sm"
+              >
+                <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+                <span>Complete Course</span>
+              </Link>
+            )}
+          </div>
+        )}
       </main>
     </div>
   );
